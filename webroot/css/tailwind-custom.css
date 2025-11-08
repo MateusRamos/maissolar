@@ -1,0 +1,54 @@
+/* Cores personalizadas para o projeto MaisSolar */
+:root {
+  /* Cores base */
+  --color-base-black: #000000;
+  --color-base-white: #ffffff;
+  
+  /* Cor de atenção (amarelo) */
+  --color-attention: #fbbf24;
+  --color-attention-dark: #f59e0b;
+  --color-attention-light: #fde047;
+  
+  /* Cor de destaque (verde) */
+  --color-highlight: #22c55e;
+  --color-highlight-dark: #16a34a;
+  --color-highlight-light: #4ade80;
+  
+  /* Cor média (verde bem escuro) */
+  --color-medium: #131f09;
+  --color-medium-light: #11270d;
+  --color-medium-dark: #051301;
+}
+
+/* Classes utilitárias personalizadas */
+.btn-primary {
+  @apply bg-highlight hover:bg-highlight-dark text-base-white px-4 py-2 rounded transition-colors;
+}
+
+.btn-secondary {
+  @apply bg-medium hover:bg-medium-light text-base-white px-4 py-2 rounded transition-colors;
+}
+
+.btn-attention {
+  @apply bg-attention hover:bg-attention-dark text-base-black px-4 py-2 rounded transition-colors;
+}
+
+.text-primary {
+  @apply text-highlight;
+}
+
+.text-secondary {
+  @apply text-medium;
+}
+
+.bg-primary {
+  @apply bg-highlight;
+}
+
+.bg-secondary {
+  @apply bg-medium;
+}
+
+.border-primary {
+  @apply border-highlight;
+}
