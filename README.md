@@ -55,4 +55,20 @@ O sistema funciona com as seguintes telas:
 Dashboard: Onde ficam todos os graficos e dados rápidos para visualizações de rendimento, além de links de redirecionamento.
 Criar Orçamentos: Tela de criações de sistema, que cria sempre com status 1, equivalente a orçamentos. Ela vai usar apenas alguns dos campos da tabela por ser um cadastro inicial.
 Instalações: Onde ficam todas as instalações cadastradas, com filtros e buscas. Nela é possível mudar o status de cada instalação, Ao mudar o status um modal aparece pedindo mais dados sobre a instalação para prosseguir par ao proximo status.
+
+
+Detalhes de sistemas:
+Essa tela vai ser dividida quanto ao status atual do sistema visualizado. Todas podem seguir o mesmo esqueleto, mas o dados mostrados vão variar.
+
+Status "Orçamento" (1):
+Divida por cards como ja fizemos, mas dessa vez sem imagens, pois trabalharemos com graficos e outros diagramas.
+O primeiro card pode ter os dados cadastrais do cliente, bem simples e pequeno (nesse cenário, o endereço pode ficar inteiro).
+No lugar do segundo card, faça 3 cards em fila. Eles devem apresentar um ícone grande, a label e o valor para potencia do sistema, consumo do sistema e area do sistema.
+No terceiro card, faça os dados de intalaçao: marca, tipo, estrutura, quantidade de modulos, potencia dos modulos, is_Micro, quantiade de micro inversores (apenas se for microinversor). Nesse card, vamos tentar fazer algo diferente. Na direita do card, faça um desenho simples de uma placa usando html, css e svg se necessário. No centro do desneho, deve aparecer o valor da potencia dos módulos, No canto superior esquerdo deve aparecer a quantidade de módulos (x10, x22, x20, por exemplo), no canto inferior no centro deve aparece o tipo de estrutura, no canto superior direito, deve aparecer o nome d amarca dos equipamentos.
+No ultimo card, apenas traga os valores por enquanto de total orçado, valor dos materiais orçado e observações do orçamento
+
+Status "Em Instalação" (2):
+Nesse caso, a tela fica quase igual a tela do status 1, a unica diferença é que o ultimos card fica ocupando apenas 3/4 da larguda da tela e aparece um novo card ocupando 1/4 na direita dele. Esse card não deve ter padding interno, dve ser apenas uma miniatura estática do orçamento do sistema.
+
+
 ... Mais por vir ...

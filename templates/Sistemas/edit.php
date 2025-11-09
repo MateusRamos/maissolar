@@ -68,9 +68,14 @@ $isConcluido = $sistema->status == 3;
 
 <!-- Timeline de Status -->
 <div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-lg border border-border-light dark:border-border-dark p-6 mb-8">
-    <div class="flex items-center justify-center relative">
-        <!-- Linha de conexão -->
-        <div class="absolute top-1/2 left-0 right-0 h-1 bg-border-light dark:bg-border-dark transform -translate-y-1/2 z-0"></div>
+    <div class="flex items-center justify-center relative px-8">
+        <!-- Linha de conexão base (cinza) -->
+        <div class="absolute top-[38%] left-16 right-16 h-1 bg-border-light dark:bg-border-dark transform -translate-y-1/2 z-0"></div>
+        
+        <!-- Linha de progresso (verde) -->
+        <?php if ($sistema->status >= 2): ?>
+        <div class="absolute top-[38%] left-16 h-1 bg-highlight transform -translate-y-1/2 z-1 transition-all duration-500" style="width: <?= $sistema->status == 2 ? 'calc(50% - 2rem)' : ($sistema->status >= 3 ? 'calc(100% - 8rem)' : '0%') ?>"></div>
+        <?php endif; ?>
         
         <!-- Status 1: Orçamento -->
         <div class="flex flex-col items-center relative z-10">
@@ -126,7 +131,7 @@ $isConcluido = $sistema->status == 3;
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <?= $this->Form->control('email', [
-                            'type' => 'email',
+                            'type' => 'text',
                             'label' => 'E-mail',
                             'class' => 'w-full px-4 py-3 border border-border-light dark:border-border-dark rounded-lg focus:ring-2 focus:ring-highlight focus:border-transparent bg-surface-light dark:bg-surface-dark text-text-light-primary dark:text-text-dark-primary',
                             'autocomplete' => 'off'
@@ -360,24 +365,32 @@ $isConcluido = $sistema->status == 3;
                         'autocomplete' => 'off'
                     ]) ?>
                 </div>
+                <?php if ($isConcluido): ?>
                 <div>
                     <?= $this->Form->control('valor_materais_final', [
                         'label' => 'Valor Materiais Final (R$)',
                         'type' => 'number',
                         'step' => '0.01',
                         'class' => 'w-full px-4 py-3 border border-border-light dark:border-border-dark rounded-lg focus:ring-2 focus:ring-highlight focus:border-transparent bg-surface-light dark:bg-surface-dark text-text-light-primary dark:text-text-dark-primary',
-                        'disabled' => $isOrcamento,
                         'autocomplete' => 'off'
                     ]) ?>
                 </div>
+                <?php endif; ?>
+                <?php if ($isInstalacao || $isConcluido): ?>
                 <div>
-                    <?= $this->Form->control('orcamento_path', [
-                        'label' => 'Caminho do Orçamento',
-                        'class' => 'w-full px-4 py-3 border border-border-light dark:border-border-dark rounded-lg focus:ring-2 focus:ring-highlight focus:border-transparent bg-surface-light dark:bg-surface-dark text-text-light-primary dark:text-text-dark-primary',
-                        'readonly' => true,
-                        'autocomplete' => 'off'
-                    ]) ?>
+                    <label class="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2">Orçamento</label>
+                    <div class="flex space-x-3">
+                        <button type="button" onclick="visualizarOrcamento()" class="flex-1 px-4 py-3 bg-highlight hover:bg-highlight-dark text-base-white rounded-lg transition-colors font-medium inline-flex items-center justify-center">
+                            <i class="fas fa-eye mr-2"></i>
+                            Visualizar
+                        </button>
+                        <button type="button" onclick="alterarOrcamento()" class="flex-1 px-4 py-3 bg-attention hover:bg-attention-dark text-base-white rounded-lg transition-colors font-medium inline-flex items-center justify-center">
+                            <i class="fas fa-edit mr-2"></i>
+                            Alterar
+                        </button>
+                    </div>
                 </div>
+                <?php endif; ?>
             </div>
             <div class="mt-4">
                 <?= $this->Form->control('observacoes_orcamento', [
@@ -392,8 +405,9 @@ $isConcluido = $sistema->status == 3;
     </div>
 </div>
 
-<!-- Bloco 5: Execução e Custos (Desabilitado para Orçamento) -->
-<div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-lg border border-border-light dark:border-border-dark overflow-hidden <?= $isOrcamento ? 'opacity-60' : '' ?>">
+<?php if ($isConcluido): ?>
+<!-- Bloco 5: Execução e Custos -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-lg border border-border-light dark:border-border-dark overflow-hidden">
     <div class="flex flex-col lg:flex-row">
         <div class="lg:w-1/3">
             <img src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=400&h=300&fit=crop" alt="Execução" class="w-full h-full object-cover min-h-[300px]">
@@ -406,7 +420,6 @@ $isConcluido = $sistema->status == 3;
                         'label' => 'Qtd. Funcionários',
                         'type' => 'number',
                         'class' => 'w-full px-4 py-3 border border-border-light dark:border-border-dark rounded-lg focus:ring-2 focus:ring-highlight focus:border-transparent bg-surface-light dark:bg-surface-dark text-text-light-primary dark:text-text-dark-primary',
-                        'disabled' => $isOrcamento,
                         'autocomplete' => 'off'
                     ]) ?>
                 </div>
@@ -415,7 +428,6 @@ $isConcluido = $sistema->status == 3;
                         'label' => 'Qtd. Carros',
                         'type' => 'number',
                         'class' => 'w-full px-4 py-3 border border-border-light dark:border-border-dark rounded-lg focus:ring-2 focus:ring-highlight focus:border-transparent bg-surface-light dark:bg-surface-dark text-text-light-primary dark:text-text-dark-primary',
-                        'disabled' => $isOrcamento,
                         'autocomplete' => 'off'
                     ]) ?>
                 </div>
@@ -426,7 +438,6 @@ $isConcluido = $sistema->status == 3;
                         'type' => 'number',
                         'step' => '0.01',
                         'class' => 'w-full px-4 py-3 border border-border-light dark:border-border-dark rounded-lg focus:ring-2 focus:ring-highlight focus:border-transparent bg-surface-light dark:bg-surface-dark text-text-light-primary dark:text-text-dark-primary',
-                        'disabled' => $isOrcamento,
                         'autocomplete' => 'off'
                     ]) ?>
                 </div>
@@ -436,26 +447,15 @@ $isConcluido = $sistema->status == 3;
                         'type' => 'number',
                         'step' => '0.01',
                         'class' => 'w-full px-4 py-3 border border-border-light dark:border-border-dark rounded-lg focus:ring-2 focus:ring-highlight focus:border-transparent bg-surface-light dark:bg-surface-dark text-text-light-primary dark:text-text-dark-primary',
-                        'disabled' => $isOrcamento,
                         'autocomplete' => 'off'
                     ]) ?>
                 </div>
-                <div>
-                    <?= $this->Form->control('custo_extra_material', [
-                        'label' => 'Custo Extra Material (R$)',
-                        'type' => 'number',
-                        'step' => '0.01',
-                        'class' => 'w-full px-4 py-3 border border-border-light dark:border-border-dark rounded-lg focus:ring-2 focus:ring-highlight focus:border-transparent bg-surface-light dark:bg-surface-dark text-text-light-primary dark:text-text-dark-primary',
-                        'disabled' => $isOrcamento,
-                        'autocomplete' => 'off'
-                    ]) ?>
-                </div>
+
                 <div>
                     <?= $this->Form->control('data_inicio', [
                         'label' => 'Data de Início',
                         'type' => 'date',
                         'class' => 'w-full px-4 py-3 border border-border-light dark:border-border-dark rounded-lg focus:ring-2 focus:ring-highlight focus:border-transparent bg-surface-light dark:bg-surface-dark text-text-light-primary dark:text-text-dark-primary',
-                        'disabled' => $isOrcamento,
                         'autocomplete' => 'off'
                     ]) ?>
                 </div>
@@ -464,7 +464,7 @@ $isConcluido = $sistema->status == 3;
                         'label' => 'Data de Término',
                         'type' => 'date',
                         'class' => 'w-full px-4 py-3 border border-border-light dark:border-border-dark rounded-lg focus:ring-2 focus:ring-highlight focus:border-transparent bg-surface-light dark:bg-surface-dark text-text-light-primary dark:text-text-dark-primary',
-                        'disabled' => $isOrcamento || $isInstalacao,
+                        'disabled' => $isInstalacao,
                         'autocomplete' => 'off'
                     ]) ?>
                 </div>
@@ -472,6 +472,7 @@ $isConcluido = $sistema->status == 3;
         </div>
     </div>
 </div>
+<?php endif; ?>
 
 <!-- Botões de Ação -->
 <div class="flex justify-end space-x-4">
@@ -488,10 +489,77 @@ $isConcluido = $sistema->status == 3;
 
 <?= $this->Form->hidden('status', ['id' => 'status-field']) ?>
 
+<!-- Modal Visualizar Orçamento -->
+<div id="modal-visualizar" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4" onclick="fecharModalVisualizar()">
+    <iframe id="pdf-viewer" src="" class="w-full h-full max-w-6xl max-h-[90vh] rounded-lg shadow-xl" frameborder="0" onclick="event.stopPropagation()"></iframe>
+</div>
+
+<!-- Modal Confirmação Status -->
+<div id="modal-confirmar-status" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-xl max-w-md w-full">
+        <div class="p-6 text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-attention bg-opacity-20 mb-4">
+                <i class="fas fa-exclamation-triangle text-attention text-xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-text-light-primary dark:text-text-dark-primary mb-2">Confirmar Alteração de Status</h3>
+            <p class="text-text-light-secondary dark:text-text-dark-secondary mb-6">Tem certeza que deseja retroceder o status? Isso irá apagar todos os dados relacionados ao status atual.</p>
+            <div class="flex space-x-3">
+                <button type="button" onclick="fecharModalConfirmar()" class="flex-1 px-4 py-3 border border-border-light dark:border-border-dark text-text-light-secondary dark:text-text-dark-secondary rounded-lg hover:bg-bg-light dark:hover:bg-medium-light transition-colors font-medium">
+                    Cancelar
+                </button>
+                <button type="button" onclick="confirmarAlteracaoStatus()" class="flex-1 px-4 py-3 bg-attention hover:bg-attention-dark text-base-white rounded-lg transition-colors font-medium">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Alterar Orçamento -->
+<div id="modal-alterar" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-xl max-w-md w-full">
+        <div class="flex justify-between items-center p-6 border-b border-border-light dark:border-border-dark">
+            <h3 class="text-xl font-bold text-text-light-primary dark:text-text-dark-primary">Alterar Orçamento</h3>
+            <button onclick="fecharModalAlterar()" class="text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        <div class="p-6">
+            <form id="form-alterar-orcamento" enctype="multipart/form-data">
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2">Novo Orçamento (PDF)</label>
+                    <div class="relative">
+                        <input type="file" id="novo-orcamento" name="orcamento" accept=".pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                        <div id="file-drop-area" class="border-2 border-dashed border-border-light dark:border-border-dark rounded-lg p-8 text-center hover:border-highlight transition-colors bg-surface-light dark:bg-surface-dark">
+                            <div class="flex flex-col items-center">
+                                <i class="fas fa-cloud-upload-alt text-4xl text-text-light-secondary dark:text-text-dark-secondary mb-4"></i>
+                                <p class="text-text-light-primary dark:text-text-dark-primary font-medium mb-2">Clique para selecionar ou arraste o arquivo aqui</p>
+                                <p class="text-text-light-secondary dark:text-text-dark-secondary text-sm">Apenas arquivos PDF são aceitos</p>
+                                <p id="file-name" class="text-highlight font-medium mt-2 hidden"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex space-x-3">
+                    <button type="button" onclick="fecharModalAlterar()" class="flex-1 px-4 py-3 border border-border-light dark:border-border-dark text-text-light-secondary dark:text-text-dark-secondary rounded-lg hover:bg-bg-light dark:hover:bg-medium-light transition-colors font-medium">
+                        Cancelar
+                    </button>
+                    <button type="button" onclick="salvarNovoOrcamento()" class="flex-1 px-4 py-3 bg-highlight hover:bg-highlight-dark text-base-white rounded-lg transition-colors font-medium">
+                        Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 <script>
 $(document).ready(function() {
     $('#telefone').mask('(00) 00000-0000');
+    
+
     
     // Controle do campo de micro inversores
     function toggleMicroContainer() {
@@ -529,23 +597,59 @@ $(document).ready(function() {
     });
 });
 
+let statusParaAlterar = null;
+
 // Função para mudar status
 function changeStatus(newStatus) {
-    const currentStatus = <?= $sistema->status ?>;
+    const currentStatus = parseInt(<?= $sistema->status ?>);
     
-    // Só permite retroceder ou manter o status atual
-    if (newStatus <= currentStatus) {
-        $('#status-field').val(newStatus);
-        
-        // Atualizar visual dos botões
-        updateStatusButtons(newStatus);
-        
-        // Recarregar página para aplicar mudanças de campos desabilitados
-        if (newStatus !== currentStatus) {
-            $('form').append('<input type="hidden" name="status" value="' + newStatus + '">');
-            $('form').submit();
-        }
+    // Não permite avançar status (só pela tela index)
+    if (newStatus > currentStatus) {
+        toastr.warning('Para avançar o status, use a tela de listagem de sistemas.');
+        return;
     }
+    
+    // Se for o mesmo status, não faz nada
+    if (newStatus === currentStatus) {
+        return;
+    }
+    
+    // Armazenar status para confirmação e mostrar modal
+    statusParaAlterar = newStatus;
+    $('#modal-confirmar-status').removeClass('hidden');
+}
+
+function fecharModalConfirmar() {
+    $('#modal-confirmar-status').addClass('hidden');
+    statusParaAlterar = null;
+}
+
+function confirmarAlteracaoStatus() {
+    if (statusParaAlterar === null) return;
+    
+    // Fazer requisição AJAX para retroceder status
+    $.ajax({
+        url: '/sistemas/retroceder-status',
+        type: 'POST',
+        data: {
+            sistema_id: <?= $sistema->id ?>,
+            novo_status: statusParaAlterar,
+            _csrfToken: $('[name="_csrfToken"]').val()
+        },
+        success: function(response) {
+            if (response.success) {
+                toastr.success('Status alterado com sucesso!');
+                location.reload();
+            } else {
+                toastr.error('Erro: ' + response.message);
+            }
+        },
+        error: function() {
+            toastr.error('Erro ao alterar status.');
+        }
+    });
+    
+    fecharModalConfirmar();
 }
 
 function updateStatusButtons(activeStatus) {
@@ -565,4 +669,109 @@ function updateStatusButtons(activeStatus) {
         $('[onclick="changeStatus(3)"]').addClass('ring-highlight-dark');
     }
 }
+
+// Funções para os modais de orçamento
+function visualizarOrcamento() {
+    const orcamentoPath = '<?= !empty($sistema->orcamento_path) ? $this->Url->build('/' . $sistema->orcamento_path) : '' ?>';
+    if (orcamentoPath) {
+        $('#pdf-viewer').attr('src', orcamentoPath);
+        $('#modal-visualizar').removeClass('hidden');
+    } else {
+        toastr.warning('Nenhum orçamento encontrado.');
+    }
+}
+
+function fecharModalVisualizar() {
+    $('#modal-visualizar').addClass('hidden');
+    $('#pdf-viewer').attr('src', '');
+}
+
+function alterarOrcamento() {
+    $('#modal-alterar').removeClass('hidden');
+}
+
+function fecharModalAlterar() {
+    $('#modal-alterar').addClass('hidden');
+    $('#novo-orcamento').val('');
+    $('#file-name').addClass('hidden').text('');
+    $('#file-drop-area').removeClass('border-highlight').addClass('border-border-light dark:border-border-dark');
+}
+
+function salvarNovoOrcamento() {
+    const fileInput = $('#novo-orcamento')[0];
+    if (!fileInput.files[0]) {
+        toastr.warning('Por favor, selecione um arquivo PDF.');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('orcamento', fileInput.files[0]);
+    formData.append('sistema_id', '<?= $sistema->id ?>');
+    formData.append('_csrfToken', $('[name="_csrfToken"]').val());
+    
+    $.ajax({
+        url: '/sistemas/upload-orcamento',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            if (response.success) {
+                toastr.success('Orçamento atualizado com sucesso!');
+                fecharModalAlterar();
+                location.reload();
+            } else {
+                toastr.error('Erro ao atualizar orçamento: ' + response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            toastr.error('Erro ao enviar arquivo.');
+        }
+    });
+}
+
+// Funcionalidade do drag & drop para o input file
+$(document).ready(function() {
+    const fileInput = $('#novo-orcamento');
+    const dropArea = $('#file-drop-area');
+    const fileName = $('#file-name');
+    
+    // Mostrar nome do arquivo quando selecionado
+    fileInput.on('change', function() {
+        const file = this.files[0];
+        if (file) {
+            fileName.text(file.name).removeClass('hidden');
+            dropArea.addClass('border-highlight').removeClass('border-border-light dark:border-border-dark');
+        } else {
+            fileName.addClass('hidden').text('');
+            dropArea.removeClass('border-highlight').addClass('border-border-light dark:border-border-dark');
+        }
+    });
+    
+    // Drag & drop events
+    dropArea.on('dragover dragenter', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).addClass('border-highlight').removeClass('border-border-light dark:border-border-dark');
+    });
+    
+    dropArea.on('dragleave dragend', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!fileInput[0].files[0]) {
+            $(this).removeClass('border-highlight').addClass('border-border-light dark:border-border-dark');
+        }
+    });
+    
+    dropArea.on('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const files = e.originalEvent.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput[0].files = files;
+            fileInput.trigger('change');
+        }
+    });
+});
 </script>

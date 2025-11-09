@@ -63,6 +63,8 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/pages/*', 'Pages::display');
     $builder->connect('/criar-orcamento', ['controller' => 'Sistemas', 'action' => 'criarOrcamento']);
     $builder->connect('/sistemas/avancar-status', ['controller' => 'Sistemas', 'action' => 'avancarStatus']);
+    $builder->connect('/sistemas/upload-orcamento', ['controller' => 'Sistemas', 'action' => 'uploadOrcamento']);
+    $builder->connect('/sistemas/retroceder-status', ['controller' => 'Sistemas', 'action' => 'retrocederStatus']);
     $builder->connect('/sistemas/concluir-instalacao/*', ['controller' => 'Sistemas', 'action' => 'concluirInstalacao']);
     $builder->connect('/login', ['controller' => 'Users', 'action' => 'login']);
     $builder->connect('/logout', ['controller' => 'Users', 'action' => 'logout']);

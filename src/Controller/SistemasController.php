@@ -95,10 +95,7 @@ class SistemasController extends AppController
                 unset($data['rua'], $data['numero'], $data['bairro'], $data['cidade'], $data['estado'], $data['cep']);
             }
             
-            // Calcular valor final dos materiais se houver custo extra
-            if (isset($data['custo_extra_material']) && !empty($data['custo_extra_material'])) {
-                $data['valor_materais_final'] = $sistema->valor_materiais_orcado + $data['custo_extra_material'];
-            }
+
             
             $sistema = $this->Sistemas->patchEntity($sistema, $data);
             if ($this->Sistemas->save($sistema)) {
@@ -269,5 +266,165 @@ class SistemasController extends AppController
         }
         
         $this->set(compact('sistema'));
+    }
+
+    public function uploadOrcamento()
+    {
+        $this->autoRender = false;
+        $this->response = $this->response->withType('application/json');
+        
+        if (!$this->request->is('post')) {
+            echo json_encode(['success' => false, 'message' => 'Método não permitido']);
+            return;
+        }
+        
+        try {
+            $sistemaId = (int) $this->request->getData('sistema_id');
+            $file = $this->request->getUploadedFile('orcamento');
+            
+            if (!$sistemaId) {
+                echo json_encode(['success' => false, 'message' => 'ID do sistema não informado']);
+                return;
+            }
+            
+            if (!$file) {
+                echo json_encode(['success' => false, 'message' => 'Arquivo não enviado']);
+                return;
+            }
+            
+            if ($file->getError() !== UPLOAD_ERR_OK) {
+                echo json_encode(['success' => false, 'message' => 'Erro no upload: ' . $file->getError()]);
+                return;
+            }
+            
+            $sistema = $this->Sistemas->get($sistemaId);
+            
+            // Excluir arquivo antigo se existir
+            if (!empty($sistema->orcamento_path)) {
+                $oldFile = WWW_ROOT . $sistema->orcamento_path;
+                if (file_exists($oldFile)) {
+                    unlink($oldFile);
+                }
+            }
+            
+            // Criar nome do arquivo baseado no cliente e data
+            $clienteNome = preg_replace('/[^a-zA-Z0-9]/', '_', $sistema->nome);
+            $dataAtual = date('Y-m-d_H-i-s');
+            $extensao = pathinfo($file->getClientFilename(), PATHINFO_EXTENSION);
+            $nomeArquivo = $clienteNome . '_' . $dataAtual . '.' . $extensao;
+            
+            // Diretório de destino
+            $uploadPath = WWW_ROOT . 'files' . DS . 'orcamentos' . DS;
+            
+            // Criar diretório se não existir
+            if (!is_dir($uploadPath)) {
+                if (!mkdir($uploadPath, 0755, true)) {
+                    echo json_encode(['success' => false, 'message' => 'Não foi possível criar o diretório']);
+                    return;
+                }
+            }
+            
+            // Mover arquivo
+            $destinoCompleto = $uploadPath . $nomeArquivo;
+            $file->moveTo($destinoCompleto);
+            
+            // Verificar se o arquivo foi movido
+            if (!file_exists($destinoCompleto)) {
+                echo json_encode(['success' => false, 'message' => 'Falha ao mover o arquivo']);
+                return;
+            }
+            
+            // Salvar caminho no banco
+            $sistema->orcamento_path = 'files/orcamentos/' . $nomeArquivo;
+            
+            if ($this->Sistemas->save($sistema)) {
+                echo json_encode(['success' => true, 'message' => 'Orçamento atualizado com sucesso']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Erro ao salvar no banco de dados']);
+            }
+            
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erro: ' . $e->getMessage()]);
+        }
+    }
+
+    public function retrocederStatus()
+    {
+        $this->autoRender = false;
+        $this->response = $this->response->withType('application/json');
+        
+        if (!$this->request->is('post')) {
+            echo json_encode(['success' => false, 'message' => 'Método não permitido']);
+            return;
+        }
+        
+        try {
+            $sistemaId = (int) $this->request->getData('sistema_id');
+            $novoStatus = (int) $this->request->getData('novo_status');
+            
+            if (!$sistemaId || !$novoStatus) {
+                echo json_encode(['success' => false, 'message' => 'Dados inválidos']);
+                return;
+            }
+            
+            $sistema = $this->Sistemas->get($sistemaId);
+            $statusAtual = $sistema->status;
+            
+            // Não permite avançar status
+            if ($novoStatus > $statusAtual) {
+                echo json_encode(['success' => false, 'message' => 'Não é possível avançar status por aqui']);
+                return;
+            }
+            
+            // Limpar dados baseado na regressão
+            if ($statusAtual == 3 && $novoStatus == 2) {
+                // Concluído -> Em Instalação: limpar dados de execução
+                $sistema->qnt_funcionarios = null;
+                $sistema->valor_materais_final = null;
+                $sistema->custo_alimentacao = null;
+                $sistema->custo_transporte = null;
+                $sistema->data_inicio = null;
+                $sistema->data_termino = null;
+                $sistema->qnt_carros = null;
+            } elseif ($statusAtual == 2 && $novoStatus == 1) {
+                // Em Instalação -> Orçamento: limpar orçamento
+                if (!empty($sistema->orcamento_path)) {
+                    $oldFile = WWW_ROOT . $sistema->orcamento_path;
+                    if (file_exists($oldFile)) {
+                        unlink($oldFile);
+                    }
+                }
+                $sistema->orcamento_path = null;
+            } elseif ($statusAtual == 3 && $novoStatus == 1) {
+                // Concluído -> Orçamento: limpar tudo
+                $sistema->qnt_funcionarios = null;
+                $sistema->valor_materais_final = null;
+                $sistema->custo_alimentacao = null;
+                $sistema->custo_transporte = null;
+                $sistema->data_inicio = null;
+                $sistema->data_termino = null;
+                $sistema->qnt_carros = null;
+                
+                if (!empty($sistema->orcamento_path)) {
+                    $oldFile = WWW_ROOT . $sistema->orcamento_path;
+                    if (file_exists($oldFile)) {
+                        unlink($oldFile);
+                    }
+                }
+                $sistema->orcamento_path = null;
+            }
+            
+            // Atualizar status
+            $sistema->status = $novoStatus;
+            
+            if ($this->Sistemas->save($sistema)) {
+                echo json_encode(['success' => true, 'message' => 'Status alterado com sucesso']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Erro ao salvar no banco de dados']);
+            }
+            
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erro: ' . $e->getMessage()]);
+        }
     }
 }
