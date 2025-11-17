@@ -77,27 +77,26 @@
                 
                 <!-- Menu -->
                 <ul class="flex items-center h-full">
-                    <!-- Botão simples -->
+                    <!-- Dashboard -->
                     <li>
-                        <a href="#" class="flex items-center h-20 px-6 text-base-white hover:bg-medium-light hover:text-attention transition-colors">
+                        <a href="/" class="flex items-center h-20 px-6 text-base-white hover:bg-medium-light hover:text-attention transition-colors">
                             Dashboard
                         </a>
                     </li>
                     
-                    <!-- Dropdown 1 -->
+                    <!-- Orçamentos -->
                     <li class="relative dropdown">
                         <button class="flex items-center h-20 px-6 text-base-white hover:bg-medium-light hover:text-attention transition-colors dropdown-toggle">
-                            Projetos
+                            Orçamentos
                             <i class="fas fa-chevron-down ml-2 text-sm"></i>
                         </button>
                         <div class="dropdown-menu absolute top-20 left-0 bg-base-white dark:bg-medium shadow-lg rounded-md py-2 w-48 hidden">
-                            <a href="#" class="block px-4 py-2 text-base-black dark:text-base-white hover:bg-gray-100 dark:hover:bg-medium-light">Listar Projetos</a>
-                            <a href="#" class="block px-4 py-2 text-base-black dark:text-base-white hover:bg-gray-100 dark:hover:bg-medium-light">Novo Projeto</a>
-                            <a href="#" class="block px-4 py-2 text-base-black dark:text-base-white hover:bg-gray-100 dark:hover:bg-medium-light">Relatórios</a>
+                            <a href="<?= $this->Url->build(['controller' => 'Orcamentos', 'action' => 'index']) ?>" class="block px-4 py-2 text-base-black dark:text-base-white hover:bg-gray-100 dark:hover:bg-medium-light">Listar Orçamentos</a>
+                            <a href="<?= $this->Url->build(['controller' => 'Orcamentos', 'action' => 'add']) ?>" class="block px-4 py-2 text-base-black dark:text-base-white hover:bg-gray-100 dark:hover:bg-medium-light">Criar Orçamento</a>
                         </div>
                     </li>
                     
-                    <!-- Dropdown 2 -->
+                    <!-- Sistemas -->
                     <li class="relative dropdown">
                         <button class="flex items-center h-20 px-6 text-base-white hover:bg-medium-light hover:text-attention transition-colors dropdown-toggle">
                             Sistemas
@@ -105,21 +104,7 @@
                         </button>
                         <div class="dropdown-menu absolute top-20 left-0 bg-base-white dark:bg-medium shadow-lg rounded-md py-2 w-48 hidden">
                             <a href="<?= $this->Url->build(['controller' => 'Sistemas', 'action' => 'index']) ?>" class="block px-4 py-2 text-base-black dark:text-base-white hover:bg-gray-100 dark:hover:bg-medium-light">Listar Sistemas</a>
-                            <a href="<?= $this->Url->build('/criar-orcamento') ?>" class="block px-4 py-2 text-base-black dark:text-base-white hover:bg-gray-100 dark:hover:bg-medium-light">Criar Orçamento</a>
-                            <a href="#" class="block px-4 py-2 text-base-black dark:text-base-white hover:bg-gray-100 dark:hover:bg-medium-light">Configurações</a>
-                        </div>
-                    </li>
-                    
-                    <!-- Dropdown 3 -->
-                    <li class="relative dropdown">
-                        <button class="flex items-center h-20 px-6 text-base-white hover:bg-medium-light hover:text-attention transition-colors dropdown-toggle">
-                            Materiais
-                            <i class="fas fa-chevron-down ml-2 text-sm"></i>
-                        </button>
-                        <div class="dropdown-menu absolute top-20 left-0 bg-base-white dark:bg-medium shadow-lg rounded-md py-2 w-48 hidden">
-                            <a href="#" class="block px-4 py-2 text-base-black dark:text-base-white hover:bg-gray-100 dark:hover:bg-medium-light">Estoque</a>
-                            <a href="#" class="block px-4 py-2 text-base-black dark:text-base-white hover:bg-gray-100 dark:hover:bg-medium-light">Fornecedores</a>
-                            <a href="#" class="block px-4 py-2 text-base-black dark:text-base-white hover:bg-gray-100 dark:hover:bg-medium-light">Pedidos</a>
+                            <a href="<?= $this->Url->build(['controller' => 'Sistemas', 'action' => 'add']) ?>" class="block px-4 py-2 text-base-black dark:text-base-white hover:bg-gray-100 dark:hover:bg-medium-light">Criar Sistema</a>
                         </div>
                     </li>
                     

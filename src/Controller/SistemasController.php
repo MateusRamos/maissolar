@@ -31,25 +31,7 @@ class SistemasController extends AppController
         $this->set(compact('sistema'));
     }
 
-    /**
-     * Add method
-     *
-     * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
-     */
-    public function add()
-    {
-        $sistema = $this->Sistemas->newEmptyEntity();
-        if ($this->request->is('post')) {
-            $sistema = $this->Sistemas->patchEntity($sistema, $this->request->getData());
-            if ($this->Sistemas->save($sistema)) {
-                $this->Flash->success(__('The sistema has been saved.'));
 
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The sistema could not be saved. Please, try again.'));
-        }
-        $this->set(compact('sistema'));
-    }
 
     /**
      * Edit method
@@ -131,7 +113,7 @@ class SistemasController extends AppController
      *
      * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
      */
-    public function criarOrcamento()
+    public function add()
     {
         $sistema = $this->Sistemas->newEmptyEntity();
         
@@ -158,7 +140,7 @@ class SistemasController extends AppController
             $sistema = $this->Sistemas->patchEntity($sistema, $data);
             
             if ($this->Sistemas->save($sistema)) {
-                $this->Flash->success('Orçamento criado com sucesso!');
+                $this->Flash->success('Sistema criado com sucesso!');
                 return $this->redirect(['action' => 'index']);
             } else {
                 $errors = $sistema->getErrors();
