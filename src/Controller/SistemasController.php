@@ -26,9 +26,7 @@ class SistemasController extends AppController
      */
     public function view($id = null)
     {
-        $sistema = $this->Sistemas->get($id, [
-            'contain' => ['Materiais'],
-        ]);
+        $sistema = $this->Sistemas->get($id);
 
         $this->set(compact('sistema'));
     }

@@ -173,60 +173,53 @@ function formatMoney($value) {
         </div>
         
         <!-- Desenho da Placa Solar -->
-        <div class="lg:w-1/3 flex items-center justify-center">
-            <div class="relative">
-                <svg width="250" height="300" viewBox="0 0 250 300" class="rounded-lg" style="border: 3px solid #C0C0C0; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-                    <!-- Fundo da placa (azul escuro solar) -->
-                    <rect x="8" y="8" width="234" height="300" fill="#1e3a8a" rx="6"/>
-                    
-                    <!-- Grid da placa solar -->
-                    <g stroke="#3b82f6" stroke-width="0.8" opacity="0.7">
-                        <!-- Linhas verticais -->
-                        <line x1="50" y1="8" x2="50" y2="172"/>
-                        <line x1="83" y1="8" x2="83" y2="172"/>
-                        <line x1="116" y1="8" x2="116" y2="172"/>
-                        <line x1="149" y1="8" x2="149" y2="172"/>
-                        <line x1="182" y1="8" x2="182" y2="172"/>
-                        <line x1="215" y1="8" x2="215" y2="172"/>
-                        
-                        <!-- Linhas horizontais -->
-                        <line x1="8" y1="35" x2="242" y2="35"/>
-                        <line x1="8" y1="62" x2="242" y2="62"/>
-                        <line x1="8" y1="89" x2="242" y2="89"/>
-                        <line x1="8" y1="116" x2="242" y2="116"/>
-                        <line x1="8" y1="143" x2="242" y2="143"/>
-                    </g>
-                    
-                    <!-- Quantidade de módulos (canto superior esquerdo) -->
-                    <rect x="15" y="15" width="35" height="18" fill="rgba(255,255,255,0.9)" rx="3" stroke="#C0C0C0" stroke-width="1"/>
-                    <text x="32" y="27" fill="#1e3a8a" class="font-bold text-xs" text-anchor="middle">
-                        x<?= h($sistema->qnt_modulos) ?>
-                    </text>
-                    
-                    <!-- Marca (canto superior direito) -->
-                    <?php if (!empty($sistema->marca)): ?>
-                    <rect x="190" y="15" width="45" height="18" fill="rgba(255,255,255,0.9)" rx="3" stroke="#C0C0C0" stroke-width="1"/>
-                    <text x="212" y="27" fill="#1e3a8a" class="font-bold text-xs" text-anchor="middle">
-                        <?= h(substr($sistema->marca, 0, 8)) ?>
-                    </text>
-                    <?php endif; ?>
-                    
-                    <!-- Potência dos módulos (centro) -->
-                    <?php if (!empty($sistema->potencia_modulos)): ?>
-                    <rect x="100" y="75" width="50" height="30" fill="rgba(255,255,255,0.95)" rx="4" stroke="#C0C0C0" stroke-width="1.5"/>
-                    <text x="125" y="95" fill="#1e3a8a" class="font-bold text-xl" text-anchor="middle">
+        <div class="lg:w-1/3 flex items-center justify-center h-80">
+            <style>
+                .solar-grid {
+                    background-color: #0f172a;
+                    background-image: 
+                        linear-gradient(#1e293b 1px, transparent 1px),
+                        linear-gradient(90deg, #1e293b 1px, transparent 1px);
+                    background-size: 20px 15px;
+                    background-position: center center;
+                }
+            </style>
+            
+            <div class="relative w-60 h-80 border-4 border-gray-400 rounded-3xl solar-grid box-border">
+                <!-- Label Esquerda Superior: Quantidade de Módulos -->
+                <div class="absolute top-0 left-0 -translate-y-1/2 -translate-x-4 z-20">
+                    <div class="bg-gray-200 text-black font-bold px-2 py-1 rounded border-2 border-gray-400 shadow-lg text-xs whitespace-nowrap">
+                        <?= h($sistema->qnt_modulos) ?> módulos
+                    </div>
+                </div>
+
+                <!-- Label Direita Superior: Tipo de Inversor -->
+                <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-4 z-20">
+                    <div class="bg-gray-200 text-black font-bold px-2 py-1 rounded border-2 border-gray-400 shadow-lg text-xs">
+                        <?= $sistema->is_micro ? 'Micro-inversor' : 'Inversor' ?>
+                    </div>
+                </div>
+
+                <!-- Linha horizontal central divisória -->
+                <div class="absolute top-1/2 left-0 w-full h-1 bg-gray-400 -translate-y-1/2 z-10"></div>
+
+                <!-- Label Central: Potência dos Módulos -->
+                <?php if (!empty($sistema->potencia_modulos)): ?>
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+                    <div class="bg-gray-200 text-black font-bold px-6 py-1 rounded-lg border-[3px] border-gray-400 shadow-lg text-lg tracking-wider">
                         <?= h($sistema->potencia_modulos) ?>W
-                    </text>
-                    <?php endif; ?>
-                    
-                    <!-- Tipo de estrutura (canto inferior centro) -->
-                    <?php if (!empty($sistema->tipo_estrutura)): ?>
-                    <rect x="85" y="150" width="80" height="18" fill="rgba(255,255,255,0.9)" rx="3" stroke="#C0C0C0" stroke-width="1"/>
-                    <text x="125" y="162" fill="#1e3a8a" class="font-bold text-xs" text-anchor="middle">
-                        <?= h($sistema->tipo_estrutura) ?>
-                    </text>
-                    <?php endif; ?>
-                </svg>
+                    </div>
+                </div>
+                <?php endif; ?>
+
+                <!-- Label Inferior: Marca -->
+                <?php if (!empty($sistema->marca)): ?>
+                <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-20">
+                    <div class="bg-gray-200 text-black font-bold px-3 py-1 rounded border-2 border-gray-400 shadow-lg text-sm tracking-wide">
+                        <?= h($sistema->marca) ?>
+                    </div>
+                </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -406,60 +399,53 @@ function formatMoney($value) {
         </div>
         
         <!-- Desenho da Placa Solar -->
-        <div class="lg:w-1/3 flex items-center justify-center">
-            <div class="relative">
-                <svg width="250" height="180" viewBox="0 0 250 180" class="rounded-lg" style="border: 3px solid #C0C0C0; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-                    <!-- Fundo da placa (azul escuro solar) -->
-                    <rect x="8" y="8" width="234" height="164" fill="#1e3a8a" rx="6"/>
-                    
-                    <!-- Grid da placa solar -->
-                    <g stroke="#3b82f6" stroke-width="0.8" opacity="0.7">
-                        <!-- Linhas verticais -->
-                        <line x1="50" y1="8" x2="50" y2="172"/>
-                        <line x1="83" y1="8" x2="83" y2="172"/>
-                        <line x1="116" y1="8" x2="116" y2="172"/>
-                        <line x1="149" y1="8" x2="149" y2="172"/>
-                        <line x1="182" y1="8" x2="182" y2="172"/>
-                        <line x1="215" y1="8" x2="215" y2="172"/>
-                        
-                        <!-- Linhas horizontais -->
-                        <line x1="8" y1="35" x2="242" y2="35"/>
-                        <line x1="8" y1="62" x2="242" y2="62"/>
-                        <line x1="8" y1="89" x2="242" y2="89"/>
-                        <line x1="8" y1="116" x2="242" y2="116"/>
-                        <line x1="8" y1="143" x2="242" y2="143"/>
-                    </g>
-                    
-                    <!-- Quantidade de módulos (canto superior esquerdo) -->
-                    <rect x="15" y="15" width="35" height="18" fill="rgba(255,255,255,0.9)" rx="3" stroke="#C0C0C0" stroke-width="1"/>
-                    <text x="32" y="27" fill="#1e3a8a" class="font-bold text-xs" text-anchor="middle">
-                        x<?= h($sistema->qnt_modulos) ?>
-                    </text>
-                    
-                    <!-- Marca (canto superior direito) -->
-                    <?php if (!empty($sistema->marca)): ?>
-                    <rect x="190" y="15" width="45" height="18" fill="rgba(255,255,255,0.9)" rx="3" stroke="#C0C0C0" stroke-width="1"/>
-                    <text x="212" y="27" fill="#1e3a8a" class="font-bold text-xs" text-anchor="middle">
-                        <?= h(substr($sistema->marca, 0, 8)) ?>
-                    </text>
-                    <?php endif; ?>
-                    
-                    <!-- Potência dos módulos (centro) -->
-                    <?php if (!empty($sistema->potencia_modulos)): ?>
-                    <rect x="100" y="75" width="50" height="30" fill="rgba(255,255,255,0.95)" rx="4" stroke="#C0C0C0" stroke-width="1.5"/>
-                    <text x="125" y="95" fill="#1e3a8a" class="font-bold text-xl" text-anchor="middle">
+        <div class="lg:w-1/3 flex items-center justify-center h-80">
+            <style>
+                .solar-grid {
+                    background-color: #0f172a;
+                    background-image: 
+                        linear-gradient(#1e293b 1px, transparent 1px),
+                        linear-gradient(90deg, #1e293b 1px, transparent 1px);
+                    background-size: 20px 15px;
+                    background-position: center center;
+                }
+            </style>
+            
+            <div class="relative w-60 h-80 border-4 border-gray-400 rounded-3xl solar-grid box-border">
+                <!-- Label Esquerda Superior: Quantidade de Módulos -->
+                <div class="absolute top-0 left-0 -translate-y-1/2 -translate-x-4 z-20">
+                    <div class="bg-gray-200 text-black font-bold px-2 py-1 rounded border-2 border-gray-400 shadow-lg text-xs whitespace-nowrap">
+                        <?= h($sistema->qnt_modulos) ?> módulos
+                    </div>
+                </div>
+
+                <!-- Label Direita Superior: Tipo de Inversor -->
+                <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-4 z-20">
+                    <div class="bg-gray-200 text-black font-bold px-2 py-1 rounded border-2 border-gray-400 shadow-lg text-xs">
+                        <?= $sistema->is_micro ? 'Micro-inversor' : 'Inversor' ?>
+                    </div>
+                </div>
+
+                <!-- Linha horizontal central divisória -->
+                <div class="absolute top-1/2 left-0 w-full h-1 bg-gray-400 -translate-y-1/2 z-10"></div>
+
+                <!-- Label Central: Potência dos Módulos -->
+                <?php if (!empty($sistema->potencia_modulos)): ?>
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+                    <div class="bg-gray-200 text-black font-bold px-6 py-1 rounded-lg border-[3px] border-gray-400 shadow-lg text-lg tracking-wider">
                         <?= h($sistema->potencia_modulos) ?>W
-                    </text>
-                    <?php endif; ?>
-                    
-                    <!-- Tipo de estrutura (canto inferior centro) -->
-                    <?php if (!empty($sistema->tipo_estrutura)): ?>
-                    <rect x="85" y="150" width="80" height="18" fill="rgba(255,255,255,0.9)" rx="3" stroke="#C0C0C0" stroke-width="1"/>
-                    <text x="125" y="162" fill="#1e3a8a" class="font-bold text-xs" text-anchor="middle">
-                        <?= h($sistema->tipo_estrutura) ?>
-                    </text>
-                    <?php endif; ?>
-                </svg>
+                    </div>
+                </div>
+                <?php endif; ?>
+
+                <!-- Label Inferior: Marca -->
+                <?php if (!empty($sistema->marca)): ?>
+                <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-20">
+                    <div class="bg-gray-200 text-black font-bold px-3 py-1 rounded border-2 border-gray-400 shadow-lg text-sm tracking-wide">
+                        <?= h($sistema->marca) ?>
+                    </div>
+                </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -507,6 +493,7 @@ function renderPdfThumbnail() {
     
     const canvas = document.getElementById('pdf-thumbnail');
     const loadingDiv = document.getElementById('pdf-loading');
+    if (!canvas || !loadingDiv) return;
     const ctx = canvas.getContext('2d');
     
     pdfjsLib.getDocument(orcamentoPath).promise.then(function(pdf) {
@@ -542,7 +529,7 @@ function visualizarOrcamento() {
         document.getElementById('pdf-viewer').src = orcamentoPath;
         document.getElementById('modal-visualizar').classList.remove('hidden');
     } else {
-        toastr.warning('Nenhum orçamento encontrado.');
+        alert('Nenhum orçamento encontrado.');
     }
 }
 
@@ -555,6 +542,336 @@ function fecharModalVisualizar() {
 document.addEventListener('DOMContentLoaded', function() {
     <?php if ($isInstalacao && !empty($sistema->orcamento_path)): ?>
     renderPdfThumbnail();
+    <?php endif; ?>
+    <?php if ($isConcluido && !empty($sistema->orcamento_path)): ?>
+    renderPdfThumbnailConcluido();
+    <?php endif; ?>
+});
+</script>
+
+<?php endif; ?>
+
+<?php if ($isConcluido): ?>
+<!-- Layout com Cards 1 e 2 (3/4) + Miniatura Orçamento (1/4) -->
+<div class="flex flex-col lg:flex-row gap-6 mb-6">
+    <!-- Cards 1 e 2 (3/4 da largura) -->
+    <div class="lg:w-3/4 space-y-6">
+        <!-- Card 1: Dados do Cliente -->
+        <div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-lg border border-border-light dark:border-border-dark p-6">
+            <h2 class="text-xl font-bold text-highlight dark:text-highlight mb-4 border-b border-border-light dark:border-border-dark pb-2">👤 Dados do Cliente</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Nome Completo</p>
+                    <p class="text-lg font-medium text-text-light-primary dark:text-text-dark-primary"><?= h($sistema->nome) ?></p>
+                </div>
+                <?php if (!empty($sistema->email)): ?>
+                <div>
+                    <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">E-mail</p>
+                    <p class="text-lg font-medium text-text-light-primary dark:text-text-dark-primary"><?= h($sistema->email) ?></p>
+                </div>
+                <?php endif; ?>
+                <?php if (!empty($sistema->telefone)): ?>
+                <div>
+                    <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Telefone</p>
+                    <p class="text-lg font-medium text-text-light-primary dark:text-text-dark-primary"><?= h($sistema->telefone) ?></p>
+                </div>
+                <?php endif; ?>
+                <?php if (!empty($sistema->endereco)): ?>
+                <div>
+                    <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Endereço</p>
+                    <p class="text-lg font-medium text-text-light-primary dark:text-text-dark-primary"><?= h($sistema->endereco) ?></p>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- Cards 2: Métricas do Sistema (3 cards em fila) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Potência do Sistema -->
+            <div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-lg border border-border-light dark:border-border-dark p-6 text-center">
+                <div class="flex flex-col items-center">
+                    <div class="w-16 h-16 bg-attention bg-opacity-20 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-bolt text-3xl text-attention"></i>
+                    </div>
+                    <h3 class="text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-2">Potência do Sistema</h3>
+                    <p class="text-2xl font-bold text-text-light-primary dark:text-text-dark-primary"><?= number_format($sistema->potencia_sistema, 2, ',', '.') ?> kWp</p>
+                </div>
+            </div>
+
+            <!-- Consumo do Sistema -->
+            <div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-lg border border-border-light dark:border-border-dark p-6 text-center">
+                <div class="flex flex-col items-center">
+                    <div class="w-16 h-16 bg-highlight bg-opacity-20 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-chart-line text-3xl text-highlight"></i>
+                    </div>
+                    <h3 class="text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-2">Consumo Mensal</h3>
+                    <p class="text-2xl font-bold text-text-light-primary dark:text-text-dark-primary"><?= number_format($sistema->consumo_sistema, 2, ',', '.') ?> kWh</p>
+                </div>
+            </div>
+
+            <!-- Área do Sistema -->
+            <div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-lg border border-border-light dark:border-border-dark p-6 text-center">
+                <div class="flex flex-col items-center">
+                    <div class="w-16 h-16 bg-attention-dark bg-opacity-20 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-ruler-combined text-3xl text-attention-dark"></i>
+                    </div>
+                    <h3 class="text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-2">Área Disponível</h3>
+                    <p class="text-2xl font-bold text-text-light-primary dark:text-text-dark-primary"><?= number_format($sistema->area_sistema, 2, ',', '.') ?> m²</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Miniatura do Orçamento (1/4 da largura) -->
+    <div class="lg:w-1/4 bg-surface-light dark:bg-surface-dark rounded-lg shadow-lg border border-border-light dark:border-border-dark overflow-hidden">
+        <?php if (!empty($sistema->orcamento_path)): ?>
+            <div class="h-full flex flex-col">
+                <div class="p-3 border-b border-border-light dark:border-border-dark">
+                    <h3 class="text-sm font-bold text-text-light-primary dark:text-text-dark-primary text-center">📄 Orçamento</h3>
+                </div>
+                <div class="flex-1 relative bg-bg-light dark:bg-medium cursor-pointer" onclick="visualizarOrcamento()">
+                    <canvas id="pdf-thumbnail-concluido" class="w-full h-full min-h-[300px] object-contain rounded"></canvas>
+                    <div id="pdf-loading-concluido" class="absolute inset-0 flex items-center justify-center bg-base-white dark:bg-medium-dark border border-border-light dark:border-border-dark rounded">
+                        <div class="text-center p-4">
+                            <i class="fas fa-spinner fa-spin text-4xl text-attention mb-4"></i>
+                            <p class="text-sm font-medium text-text-light-primary dark:text-text-dark-primary">Carregando...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php else: ?>
+            <div class="h-full flex items-center justify-center p-6">
+                <div class="text-center">
+                    <i class="fas fa-file-pdf text-4xl text-text-light-secondary dark:text-text-dark-secondary mb-3"></i>
+                    <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Nenhum orçamento disponível</p>
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+<!-- Card 3: Dados de Instalação com Desenho da Placa -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-lg border border-border-light dark:border-border-dark p-6 mb-6">
+    <h2 class="text-xl font-bold text-highlight dark:text-highlight mb-6 border-b border-border-light dark:border-border-dark pb-2">🔧 Dados de Instalação</h2>
+    <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Dados Técnicos -->
+        <div class="lg:w-2/3 space-y-4">
+            <?php if (!empty($sistema->marca)): ?>
+            <div>
+                <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Marca dos Equipamentos</p>
+                <p class="text-lg font-medium text-text-light-primary dark:text-text-dark-primary"><?= h($sistema->marca) ?></p>
+            </div>
+            <?php endif; ?>
+            
+            <?php if (!empty($sistema->tipo_estrutura)): ?>
+            <div>
+                <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Tipo de Estrutura</p>
+                <p class="text-lg font-medium text-text-light-primary dark:text-text-dark-primary"><?= h($sistema->tipo_estrutura) ?></p>
+            </div>
+            <?php endif; ?>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Quantidade de Módulos</p>
+                    <p class="text-lg font-medium text-text-light-primary dark:text-text-dark-primary"><?= h($sistema->qnt_modulos) ?> unidades</p>
+                </div>
+                
+                <?php if (!empty($sistema->potencia_modulos)): ?>
+                <div>
+                    <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Potência dos Módulos</p>
+                    <p class="text-lg font-medium text-text-light-primary dark:text-text-dark-primary"><?= h($sistema->potencia_modulos) ?>W</p>
+                </div>
+                <?php endif; ?>
+            </div>
+            
+            <div>
+                <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Usa Microinversor?</p>
+                <p class="text-lg font-medium text-text-light-primary dark:text-text-dark-primary"><?= $sistema->is_micro ? 'Sim' : 'Não' ?></p>
+            </div>
+            
+            <?php if ($sistema->is_micro && !empty($sistema->qnt_micro)): ?>
+            <div>
+                <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Quantidade de Microinversores</p>
+                <p class="text-lg font-medium text-text-light-primary dark:text-text-dark-primary"><?= h($sistema->qnt_micro) ?> unidades</p>
+            </div>
+            <?php endif; ?>
+        </div>
+        
+        <!-- Desenho da Placa Solar -->
+        <div class="lg:w-1/3 flex items-center justify-center h-80">
+            <style>
+                .solar-grid {
+                    background-color: #0f172a;
+                    background-image: 
+                        linear-gradient(#1e293b 1px, transparent 1px),
+                        linear-gradient(90deg, #1e293b 1px, transparent 1px);
+                    background-size: 20px 15px;
+                    background-position: center center;
+                }
+            </style>
+            
+            <div class="relative w-60 h-80 border-4 border-gray-400 rounded-3xl solar-grid box-border">
+                <!-- Label Esquerda Superior: Quantidade de Módulos -->
+                <div class="absolute top-0 left-0 -translate-y-1/2 -translate-x-4 z-20">
+                    <div class="bg-gray-200 text-black font-bold px-2 py-1 rounded border-2 border-gray-400 shadow-lg text-xs whitespace-nowrap">
+                        <?= h($sistema->qnt_modulos) ?> módulos
+                    </div>
+                </div>
+
+                <!-- Label Direita Superior: Tipo de Inversor -->
+                <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-4 z-20">
+                    <div class="bg-gray-200 text-black font-bold px-2 py-1 rounded border-2 border-gray-400 shadow-lg text-xs">
+                        <?= $sistema->is_micro ? 'Micro-inversor' : 'Inversor' ?>
+                    </div>
+                </div>
+
+                <!-- Linha horizontal central divisória -->
+                <div class="absolute top-1/2 left-0 w-full h-1 bg-gray-400 -translate-y-1/2 z-10"></div>
+
+                <!-- Label Central: Potência dos Módulos -->
+                <?php if (!empty($sistema->potencia_modulos)): ?>
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+                    <div class="bg-gray-200 text-black font-bold px-6 py-1 rounded-lg border-[3px] border-gray-400 shadow-lg text-lg tracking-wider">
+                        <?= h($sistema->potencia_modulos) ?>W
+                    </div>
+                </div>
+                <?php endif; ?>
+
+                <!-- Label Inferior: Marca -->
+                <?php if (!empty($sistema->marca)): ?>
+                <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-20">
+                    <div class="bg-gray-200 text-black font-bold px-3 py-1 rounded border-2 border-gray-400 shadow-lg text-sm tracking-wide">
+                        <?= h($sistema->marca) ?>
+                    </div>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Card 4: Dados de Instalação Completos -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-lg border border-border-light dark:border-border-dark p-6 mb-6">
+    <h2 class="text-xl font-bold text-highlight dark:text-highlight mb-6 border-b border-border-light dark:border-border-dark pb-2">📋 Dados da Instalação</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+            <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Data de Início</p>
+            <p class="text-lg font-medium text-text-light-primary dark:text-text-dark-primary"><?= h($sistema->data_inicio) ?></p>
+        </div>
+        
+        <div>
+            <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Data de Término</p>
+            <p class="text-lg font-medium text-text-light-primary dark:text-text-dark-primary"><?= h($sistema->data_termino) ?></p>
+        </div>
+        
+        <div>
+            <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Quantidade de Funcionários</p>
+            <p class="text-lg font-medium text-text-light-primary dark:text-text-dark-primary"><?= h($sistema->qnt_funcionarios) ?></p>
+        </div>
+        
+        <div>
+            <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Quantidade de Carros</p>
+            <p class="text-lg font-medium text-text-light-primary dark:text-text-dark-primary"><?= h($sistema->qnt_carros) ?></p>
+        </div>
+    </div>
+    
+        
+        <div>
+            <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Custo Alimentação</p>
+            <p class="text-lg font-medium text-text-light-primary dark:text-text-dark-primary"><?= formatMoney($sistema->custo_alimentacao) ?></p>
+        </div>
+        
+        <div>
+            <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Custo Transporte</p>
+            <p class="text-lg font-medium text-text-light-primary dark:text-text-dark-primary"><?= formatMoney($sistema->custo_transporte) ?></p>
+        </div>
+        
+        <div>
+            <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Valor Materiais Final</p>
+            <p class="text-lg font-medium text-text-light-primary dark:text-text-dark-primary"><?= formatMoney($sistema->valor_materais_final) ?></p>
+        </div>
+</div>
+
+<!-- Card 5: Dados de Homologação -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-lg border border-border-light dark:border-border-dark p-6 mb-6">
+    <h2 class="text-xl font-bold text-highlight dark:text-highlight mb-6 border-b border-border-light dark:border-border-dark pb-2">✅ Dados de Homologação</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+            <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Status Ativo</p>
+            <p class="text-lg font-medium text-text-light-primary dark:text-text-dark-primary"><?= $sistema->is_active ? 'Sim' : 'Não' ?></p>
+        </div>
+        
+        <div>
+            <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Data de Criação</p>
+            <p class="text-lg font-medium text-text-light-primary dark:text-text-dark-primary"><?= h($sistema->created) ?></p>
+        </div>
+    </div>
+</div>
+
+<!-- Card 6: Valores Finais -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-lg border border-border-light dark:border-border-dark p-6">
+    <h2 class="text-xl font-bold text-highlight dark:text-highlight mb-6 border-b border-border-light dark:border-border-dark pb-2">💰 Valores Finais</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+            <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Valor Total Orçado</p>
+            <p class="text-2xl font-bold text-attention dark:text-attention"><?= formatMoney($sistema->valor_orcado) ?></p>
+        </div>
+        
+        <div>
+            <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Valor Materiais Final</p>
+            <p class="text-2xl font-bold text-highlight dark:text-highlight"><?= formatMoney($sistema->valor_materais_final) ?></p>
+        </div>
+        
+        <div>
+            <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Total de Custos</p>
+            <p class="text-2xl font-bold text-text-light-primary dark:text-text-dark-primary"><?= formatMoney($sistema->valor_materais_final + $sistema->custo_alimentacao + $sistema->custo_transporte) ?></p>
+        </div>
+    </div>
+    
+
+</div>
+
+<script>
+// Renderizar thumbnail do PDF para status concluído
+function renderPdfThumbnailConcluido() {
+    const orcamentoPath = '<?= !empty($sistema->orcamento_path) ? $this->Url->build('/' . $sistema->orcamento_path) : '' ?>';
+    if (!orcamentoPath) return;
+    
+    const canvas = document.getElementById('pdf-thumbnail-concluido');
+    const loadingDiv = document.getElementById('pdf-loading-concluido');
+    if (!canvas || !loadingDiv) return;
+    const ctx = canvas.getContext('2d');
+    
+    pdfjsLib.getDocument(orcamentoPath).promise.then(function(pdf) {
+        pdf.getPage(1).then(function(page) {
+            const viewport = page.getViewport({scale: 0.5});
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            
+            const renderContext = {
+                canvasContext: ctx,
+                viewport: viewport
+            };
+            
+            page.render(renderContext).promise.then(function() {
+                loadingDiv.style.display = 'none';
+            });
+        });
+    }).catch(function(error) {
+        console.error('Erro ao carregar PDF:', error);
+        loadingDiv.innerHTML = `
+            <div class="text-center p-4">
+                <i class="fas fa-file-pdf text-4xl text-text-light-secondary dark:text-text-dark-secondary mb-3"></i>
+                <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Erro ao carregar PDF</p>
+            </div>
+        `;
+    });
+}
+
+// Carregar thumbnail quando a página carregar
+document.addEventListener('DOMContentLoaded', function() {
+    <?php if ($isConcluido && !empty($sistema->orcamento_path)): ?>
+    renderPdfThumbnailConcluido();
     <?php endif; ?>
 });
 </script>
