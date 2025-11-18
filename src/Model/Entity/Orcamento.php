@@ -11,6 +11,7 @@ use Cake\ORM\Entity;
  * @property int $id
  * @property string|null $nome
  * @property string|null $cliente
+ * @property \Cake\I18n\FrozenDate|null $data_orcamento
  * @property float|null $mao_de_obra
  * @property \Cake\I18n\FrozenTime $created
  * @property int|null $is_active
@@ -31,6 +32,7 @@ class Orcamento extends Entity
     protected $_accessible = [
         'nome' => true,
         'cliente' => true,
+        'data_orcamento' => true,
         'mao_de_obra' => true,
         'created' => true,
         'is_active' => true,

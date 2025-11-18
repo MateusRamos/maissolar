@@ -33,7 +33,7 @@ class OrcamentosController extends AppController
     public function view($id = null)
     {
         $orcamento = $this->Orcamentos->get($id, [
-            'contain' => ['Materiais'],
+            'contain' => ['Materiais' => ['sort' => ['Materiais.id' => 'ASC']]],
         ]);
 
         $this->set(compact('orcamento'));
@@ -48,13 +48,34 @@ class OrcamentosController extends AppController
     {
         $orcamento = $this->Orcamentos->newEmptyEntity();
         if ($this->request->is('post')) {
-            $orcamento = $this->Orcamentos->patchEntity($orcamento, $this->request->getData());
+            $data = $this->request->getData();
+            $orcamento = $this->Orcamentos->patchEntity($orcamento, $data);
+            
             if ($this->Orcamentos->save($orcamento)) {
-                $this->Flash->success(__('The orcamento has been saved.'));
-
+                // Salvar materiais se existirem
+                if (!empty($data['materiais'])) {
+                    $materiais = json_decode($data['materiais'], true);
+                    foreach ($materiais as $material) {
+                        $materialEntity = $this->Orcamentos->Materiais->newEmptyEntity();
+                        $materialData = [
+                            'descricao' => $material['nome'],
+                            'qnt' => $material['quantidade'],
+                            'preco_unitario' => $material['preco_unitario'],
+                            'valor_unit' => $material['preco_unitario'],
+                            'valor_total' => $material['quantidade'] * $material['preco_unitario'],
+                            'orcamento_id' => $orcamento->id,
+                            'is_extra' => 0,
+                            'is_active' => 1
+                        ];
+                        $materialEntity = $this->Orcamentos->Materiais->patchEntity($materialEntity, $materialData);
+                        $this->Orcamentos->Materiais->save($materialEntity);
+                    }
+                }
+                
+                $this->Flash->success(__('Orçamento salvo com sucesso!'));
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The orcamento could not be saved. Please, try again.'));
+            $this->Flash->error(__('Erro ao salvar orçamento. Tente novamente.'));
         }
         $this->set(compact('orcamento'));
     }
@@ -69,16 +90,40 @@ class OrcamentosController extends AppController
     public function edit($id = null)
     {
         $orcamento = $this->Orcamentos->get($id, [
-            'contain' => [],
+            'contain' => ['Materiais' => ['sort' => ['Materiais.id' => 'ASC']]],
         ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $orcamento = $this->Orcamentos->patchEntity($orcamento, $this->request->getData());
+            $data = $this->request->getData();
+            $orcamento = $this->Orcamentos->patchEntity($orcamento, $data);
+            
             if ($this->Orcamentos->save($orcamento)) {
-                $this->Flash->success(__('The orcamento has been saved.'));
-
+                // Deletar materiais existentes
+                $this->Orcamentos->Materiais->deleteAll(['orcamento_id' => $id]);
+                
+                // Salvar novos materiais
+                if (!empty($data['materiais'])) {
+                    $materiais = json_decode($data['materiais'], true);
+                    foreach ($materiais as $material) {
+                        $materialEntity = $this->Orcamentos->Materiais->newEmptyEntity();
+                        $materialData = [
+                            'descricao' => $material['nome'],
+                            'qnt' => $material['quantidade'],
+                            'preco_unitario' => $material['preco_unitario'],
+                            'valor_unit' => $material['preco_unitario'],
+                            'valor_total' => $material['quantidade'] * $material['preco_unitario'],
+                            'orcamento_id' => $orcamento->id,
+                            'is_extra' => 0,
+                            'is_active' => 1
+                        ];
+                        $materialEntity = $this->Orcamentos->Materiais->patchEntity($materialEntity, $materialData);
+                        $this->Orcamentos->Materiais->save($materialEntity);
+                    }
+                }
+                
+                $this->Flash->success(__('Orçamento atualizado com sucesso!'));
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The orcamento could not be saved. Please, try again.'));
+            $this->Flash->error(__('Erro ao atualizar orçamento. Tente novamente.'));
         }
         $this->set(compact('orcamento'));
     }
@@ -101,5 +146,15 @@ class OrcamentosController extends AppController
         }
 
         return $this->redirect(['action' => 'index']);
+    }
+
+    public function pdf($id = null)
+    {
+        $orcamento = $this->Orcamentos->get($id, [
+            'contain' => ['Materiais' => ['sort' => ['Materiais.id' => 'ASC']]],
+        ]);
+
+        $this->viewBuilder()->setLayout('pdf');
+        $this->set(compact('orcamento'));
     }
 }

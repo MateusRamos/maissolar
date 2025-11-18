@@ -31,6 +31,8 @@ $this->assign('title', 'Criar Orçamento - MaisSolar');
 <h1 class="text-4xl font-bold text-text-light-primary dark:text-text-dark-primary mb-8">Criar Novo Orçamento</h1>
 
 <?= $this->Form->create($orcamento, ['id' => 'orcamentoForm']) ?>
+<?= $this->Form->hidden('is_active', ['value' => 1]) ?>
+<?= $this->Form->hidden('mao_de_obra', ['value' => 0]) ?>
 
 <!-- Campos básicos -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -42,10 +44,11 @@ $this->assign('title', 'Criar Orçamento - MaisSolar');
         ]) ?>
     </div>
     <div>
-        <?= $this->Form->control('cliente', [
-            'label' => 'Nome do Cliente',
+        <?= $this->Form->control('data_orcamento', [
+            'type' => 'date',
+            'label' => 'Data do Orçamento',
             'class' => 'w-full px-4 py-3 border border-border-light dark:border-border-dark rounded-lg focus:ring-2 focus:ring-highlight focus:border-transparent bg-surface-light dark:bg-surface-dark text-text-light-primary dark:text-text-dark-primary',
-            'required' => true
+            'value' => date('Y-m-d')
         ]) ?>
     </div>
 </div>
@@ -66,8 +69,10 @@ $this->assign('title', 'Criar Orçamento - MaisSolar');
                     <div class="text-right">
                         <p class="text-gray-600 dark:text-gray-400">Data: <span id="data-atual"><?= date('d/m/Y') ?></span></p>
                         <p class="text-gray-600 dark:text-gray-400">Cliente: 
-                            <input type="text" id="cliente-doc" placeholder="Nome do cliente" 
-                                   class="border-0 border-b border-gray-300 dark:border-gray-600 bg-transparent text-gray-800 dark:text-gray-200 outline-0 min-w-48">
+                            <input type="text" id="cliente-doc" name="cliente" placeholder="Nome do cliente" 
+                                   class="border-0 border-b border-gray-300 dark:border-gray-600 bg-transparent text-gray-800 dark:text-gray-200 outline-0" 
+                                   style="width: 12rem;" 
+                                   oninput="this.style.width = Math.max(12, this.value.length * 0.8 + 2) + 'ch'">
                         </p>
                     </div>
                 </div>
@@ -83,6 +88,7 @@ $this->assign('title', 'Criar Orçamento - MaisSolar');
                         <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-left text-gray-800 dark:text-gray-200 text-xs">Descrição</th>
                         <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-center w-24 text-gray-800 dark:text-gray-200 text-xs">Preço Unit.</th>
                         <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-center w-24 text-gray-800 dark:text-gray-200 text-xs">Total</th>
+                        <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-center w-16 text-gray-800 dark:text-gray-200 text-xs">Ação</th>
                     </tr>
                 </thead>
                 <tbody id="tabela-itens">
@@ -124,22 +130,24 @@ $this->assign('title', 'Criar Orçamento - MaisSolar');
 <script>
 let contadorLinhas = 0;
 
-// Sincronizar campos de cliente
-document.querySelector('input[name="cliente"]').addEventListener('input', function() {
-    document.getElementById('cliente-doc').value = this.value;
+// Sincronizar data do orçamento com o PDF
+document.querySelector('input[name="data_orcamento"]').addEventListener('change', function() {
+    const dataValue = this.value;
+    if (dataValue) {
+        const date = new Date(dataValue + 'T00:00:00');
+        const formattedDate = date.toLocaleDateString('pt-BR');
+        document.getElementById('data-atual').textContent = formattedDate;
+    }
 });
 
-document.getElementById('cliente-doc').addEventListener('input', function() {
-    document.querySelector('input[name="cliente"]').value = this.value;
-});
+// Campo cliente apenas no documento
+// Não há mais sincronização pois o campo cliente só existe no PDF
 
-// Função para adicionar nova linha (inicial)
 function adicionarLinha() {
     const tbody = document.getElementById('tabela-itens');
     const novaLinha = criarLinha();
     tbody.appendChild(novaLinha);
     
-    // Focar no campo quantidade da nova linha
     setTimeout(() => {
         novaLinha.querySelector('input[name*="[quantidade]"]').focus();
     }, 100);
@@ -147,11 +155,11 @@ function adicionarLinha() {
     return novaLinha;
 }
 
-function handleEnter(event) {
-    if (event.key === 'Enter') {
+function handleTab(event, linhaId) {
+    if (event.key === 'Tab' && !event.shiftKey) {
         event.preventDefault();
-        const linhaAtual = event.target.closest('tr');
         const novaLinha = criarLinha();
+        const linhaAtual = document.getElementById(`linha-${linhaId}`);
         linhaAtual.insertAdjacentElement('afterend', novaLinha);
         setTimeout(() => {
             novaLinha.querySelector('input[name*="[quantidade]"]').focus();
@@ -159,63 +167,45 @@ function handleEnter(event) {
     }
 }
 
-let linhaComFoco = null;
+// Prevenir Enter em todos os inputs
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter' && event.target.tagName === 'INPUT') {
+        event.preventDefault();
+    }
+});
 
-
-
-function verificarLinhaVazia(linha) {
-    const inputs = linha.querySelectorAll('input[type="text"], input[type="number"]');
-    return Array.from(inputs).every(input => !input.value.trim());
-}
-
-function removerLinhasVazias() {
-    const linhas = document.querySelectorAll('#tabela-itens tr');
+function excluirLinha(linhaId) {
+    const linha = document.getElementById(`linha-${linhaId}`);
+    const totalLinhas = document.querySelectorAll('#tabela-itens tr').length;
     
-    linhas.forEach((linha, index) => {
-        if (index === linhas.length - 1 || linha === linhaComFoco) return;
-        
-        if (verificarLinhaVazia(linha)) {
-            linha.remove();
-            calcularTotalGeral();
-        }
-    });
+    if (totalLinhas > 1) {
+        linha.remove();
+        calcularTotalGeral();
+    }
 }
 
-
-
-// Função para criar linha (separada para reutilização)
 function criarLinha() {
     contadorLinhas++;
     const tr = document.createElement('tr');
     tr.id = `linha-${contadorLinhas}`;
-    tr.className = 'relative';
-    
     
     tr.innerHTML = `
         <td class="border border-gray-300 dark:border-gray-600 px-2 py-1">
             <input type="number" name="itens[${contadorLinhas}][quantidade]" 
                    class="w-full border-0 outline-0 bg-transparent text-center text-gray-800 dark:text-gray-200 text-sm no-arrows" 
-                   placeholder="1" value="1" min="1"
-                   onfocus="linhaComFoco = this.closest('tr')"
-                   onblur="linhaComFoco = null; setTimeout(removerLinhasVazias, 300); calcularTotal(${contadorLinhas})"
-                   onkeydown="handleEnter(event)"
+                   placeholder="1" min="1"
                    oninput="calcularTotal(${contadorLinhas})">
         </td>
         <td class="border border-gray-300 dark:border-gray-600 px-3 py-1">
             <input type="text" name="itens[${contadorLinhas}][descricao]" 
                    class="w-full border-0 outline-0 bg-transparent text-gray-800 dark:text-gray-200 text-sm" 
-                   placeholder="Descrição do item..."
-                   onfocus="linhaComFoco = this.closest('tr')"
-                   onblur="linhaComFoco = null; setTimeout(removerLinhasVazias, 300)"
-                   onkeydown="handleEnter(event)">
+                   placeholder="Descrição do item...">
         </td>
         <td class="border border-gray-300 dark:border-gray-600 px-2 py-1">
             <input type="number" name="itens[${contadorLinhas}][preco_unitario]" 
                    class="w-full border-0 outline-0 bg-transparent text-center text-gray-800 dark:text-gray-200 text-sm no-arrows" 
                    placeholder="0,00" step="0.01"
-                   onfocus="linhaComFoco = this.closest('tr')"
-                   onblur="formatarPreco(this); linhaComFoco = null; setTimeout(removerLinhasVazias, 300); calcularTotal(${contadorLinhas})"
-                   onkeydown="handleEnter(event)"
+                   onblur="formatarPreco(this); calcularTotal(${contadorLinhas})"
                    oninput="calcularTotal(${contadorLinhas})">
         </td>
         <td class="border border-gray-300 dark:border-gray-600 px-2 py-1">
@@ -223,21 +213,23 @@ function criarLinha() {
                    class="w-full border-0 outline-0 bg-transparent text-center font-bold text-gray-800 dark:text-gray-200 text-sm" 
                    placeholder="0,00" readonly>
         </td>
-
+        <td class="border border-gray-300 dark:border-gray-600 px-2 py-1 text-center">
+            <button type="button" onclick="excluirLinha(${contadorLinhas})" 
+                    onkeydown="handleTab(event, ${contadorLinhas})"
+                    class="text-red-500 hover:text-red-700 text-sm">
+                <i class="fas fa-trash"></i>
+            </button>
+        </td>
     `;
-    
-
     
     return tr;
 }
 
-// Função para formatar preço com 2 casas decimais
 function formatarPreco(input) {
     const valor = parseFloat(input.value) || 0;
     input.value = valor.toFixed(2);
 }
 
-// Função para calcular total da linha
 function calcularTotal(linhaId) {
     const quantidade = document.querySelector(`input[name="itens[${linhaId}][quantidade]"]`).value || 1;
     const precoUnitario = document.querySelector(`input[name="itens[${linhaId}][preco_unitario]"]`).value || 0;
@@ -248,7 +240,6 @@ function calcularTotal(linhaId) {
     calcularTotalGeral();
 }
 
-// Função para calcular total geral
 function calcularTotalGeral() {
     let total = 0;
     document.querySelectorAll('input[name*="[preco_total]"]').forEach(input => {
@@ -261,43 +252,35 @@ function calcularTotalGeral() {
     });
 }
 
-
-
-// Inicializar com uma linha
 document.addEventListener('DOMContentLoaded', function() {
     adicionarLinha();
 });
 
-// Interceptar submit para incluir dados dos itens
 document.getElementById('orcamentoForm').addEventListener('submit', function(e) {
-    // Adicionar campo hidden com os itens em JSON
-    const itens = [];
+    const materiais = [];
     document.querySelectorAll('#tabela-itens tr').forEach(linha => {
-        const descricao = linha.querySelector('input[type="text"]').value.trim();
-        const preco = linha.querySelector('input[name*="[preco_unitario]"]').value.trim();
+        const descricao = linha.querySelector('input[name*="[descricao]"]').value.trim();
+        const quantidade = linha.querySelector('input[name*="[quantidade]"]').value.trim();
+        const precoUnitario = linha.querySelector('input[name*="[preco_unitario]"]').value.trim();
         
-        if (descricao || preco) {
-            const quantidade = linha.querySelector('input[name*="[quantidade]"]').value.trim() || 1;
-            itens.push({
+        if (descricao && quantidade && precoUnitario) {
+            materiais.push({
+                nome: descricao,
                 quantidade: parseInt(quantidade),
-                descricao: descricao,
-                preco_unitario: parseFloat(preco) || 0,
-                preco_total: parseFloat(quantidade) * parseFloat(preco) || 0
+                preco_unitario: parseFloat(precoUnitario)
             });
         }
     });
     
-    // Criar campo hidden com os itens
     const hiddenInput = document.createElement('input');
     hiddenInput.type = 'hidden';
-    hiddenInput.name = 'itens_json';
-    hiddenInput.value = JSON.stringify(itens);
+    hiddenInput.name = 'materiais';
+    hiddenInput.value = JSON.stringify(materiais);
     this.appendChild(hiddenInput);
 });
 </script>
 
 <style>
-/* Remover setas dos inputs number */
 .no-arrows::-webkit-outer-spin-button,
 .no-arrows::-webkit-inner-spin-button {
     -webkit-appearance: none;
@@ -306,21 +289,5 @@ document.getElementById('orcamentoForm').addEventListener('submit', function(e) 
 
 .no-arrows[type=number] {
     -moz-appearance: textfield;
-}
-
-@media print {
-    body * {
-        visibility: hidden;
-    }
-    #documento-a4, #documento-a4 * {
-        visibility: visible;
-    }
-    #documento-a4 {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 280mm !important;
-        height: 297mm !important;
-    }
 }
 </style>

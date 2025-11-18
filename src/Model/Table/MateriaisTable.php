@@ -74,6 +74,22 @@ class MateriaisTable extends Table
             ->allowEmptyString('sistema_id');
 
         $validator
+            ->integer('orcamento_id')
+            ->allowEmptyString('orcamento_id');
+
+        $validator
+            ->decimal('preco_unitario')
+            ->allowEmptyString('preco_unitario');
+
+        $validator
+            ->decimal('valor_unit')
+            ->allowEmptyString('valor_unit');
+
+        $validator
+            ->decimal('valor_total')
+            ->allowEmptyString('valor_total');
+
+        $validator
             ->notEmptyString('is_active');
 
         return $validator;

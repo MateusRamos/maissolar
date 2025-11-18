@@ -71,6 +71,10 @@ class OrcamentosTable extends Table
             ->allowEmptyString('cliente');
 
         $validator
+            ->date('data_orcamento')
+            ->allowEmptyDate('data_orcamento');
+
+        $validator
             ->numeric('mao_de_obra')
             ->allowEmptyString('mao_de_obra');
 

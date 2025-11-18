@@ -58,7 +58,7 @@ $this->assign('title', 'Orçamentos - MaisSolar');
                         <?= $this->Paginator->sort('cliente', 'Cliente') ?>
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-base-white uppercase tracking-wider">
-                        <?= $this->Paginator->sort('created', 'Data de Criação') ?>
+                        <?= $this->Paginator->sort('data_orcamento', 'Data do Orçamento') ?>
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-base-white uppercase tracking-wider">
                         Ações
@@ -79,7 +79,7 @@ $this->assign('title', 'Orçamentos - MaisSolar');
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-text-light-secondary dark:text-text-dark-secondary">
-                            <?= $orcamento->created->format('d/m/Y') ?>
+                            <?= $orcamento->data_orcamento ? $orcamento->data_orcamento->format('d/m/Y') : '-' ?>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-md">
                             <div class="flex space-x-3">
